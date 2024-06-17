@@ -33,7 +33,7 @@ abstract class EnvConfig
     target =
       if options[:type]?
         options[:type]?
-      elsif options[:default]?
+      elsif !options[:default]?.nil?
         options[:default]?.class
       else
         String

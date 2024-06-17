@@ -143,38 +143,48 @@ end
 ######################################################################
 
 old_foo = ENV["FOO"]?
+old_bar = ENV["BAR"]?
 ENV["FOO"] = nil
+ENV["BAR"] = nil
 
 class ConfigWithFlagDefault < EnvConfig
   config do
     expect_env FOO, description: "Bool", default: true
+    expect_env BAR, description: "Bool", default: false
   end
 end
 
 ENV["FOO"] = old_foo
+ENV["BAR"] = old_bar
 
 describe ConfigWithFlagDefault do
   it "works" do
     ConfigWithFlagDefault::FOO.should eq(true)
+    ConfigWithFlagDefault::BAR.should eq(false)
   end
 end
 
 ######################################################################
 
 old_foo = ENV["FOO"]?
+old_bar = ENV["BAR"]?
 ENV["FOO"] = "true"
+ENV["BAR"] = "false"
 
 class ConfigWithFlagEnv < EnvConfig
   config do
     expect_env FOO, description: "Bool", type: Bool
+    expect_env BAR, description: "Bool", type: Bool
   end
 end
 
 ENV["FOO"] = old_foo
+ENV["BAR"] = old_bar
 
 describe ConfigWithFlagEnv do
   it "works" do
     ConfigWithFlagEnv::FOO.should eq(true)
+    ConfigWithFlagEnv::BAR.should eq(false)
   end
 end
 
