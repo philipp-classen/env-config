@@ -54,32 +54,30 @@ abstract class EnvConfig
       end
     end
 
-    if value.empty?
-      Log.info { "#{key} => (not set)" }
-    else
-      Log.info { "#{key} => #{value}" }
-    end
+    result =
+      if target == String
+        value
+      elsif target == Bool
+        to_bool(value)
+      elsif target == Int32
+        value.to_i
+      elsif target == Int64
+        value.to_i64
+      elsif target == Float32
+        value.to_f32
+      elsif target == Float64
+        value.to_f64
+      else
+        puts "ERROR: unsupported type detected for environment variable #{key} (got: <<#{value}>>, deduced <<#{value}}>> of type <<#{target}>>)"
+        puts "Description: #{options[:description]}" if options[:description]
+        puts "Example: #{options[:example]?}" if options[:example]?
+        puts "Default: #{options[:default]?}" if options[:default]?
+        puts "Hint: if nothing works, try to use a String, and then write your own converter."
+        terminate_handler!(key)
+      end
 
-    if target == String
-      value
-    elsif target == Bool
-      to_bool(value)
-    elsif target == Int32
-      value.to_i
-    elsif target == Int64
-      value.to_i64
-    elsif target == Float32
-      value.to_f32
-    elsif target == Float64
-      value.to_f64
-    else
-      puts "ERROR: unsupported type detected for environment variable #{key} (got: <<#{value}>>, deduced <<#{value}}>> of type <<#{target}>>)"
-      puts "Description: #{options[:description]}" if options[:description]
-      puts "Example: #{options[:example]?}" if options[:example]?
-      puts "Default: #{options[:default]?}" if options[:default]?
-      puts "Hint: if nothing works, try to use a String, and then write your own converter."
-      terminate_handler!(key)
-    end
+    Log.info { result.is_a?(String) && result.empty? ? "#{key} => (not set)" : "#{key} => #{result}" }
+    result
   end
 
   macro expect_env(name, **options)
