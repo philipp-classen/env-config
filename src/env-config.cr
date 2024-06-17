@@ -118,9 +118,9 @@ abstract class EnvConfig
   def self.pretty_regexp(regexp : Regex) : String
     case regexp
     when NUMBER
-      %q("#{regexp.source} (a non-negative integer)")
+      %Q("#{regexp.source} (a non-negative integer)")
     when FLAG
-      %q("#{regexp.source} (a boolean flag: "true","1","on","enabled" vs "false","0","off","disabled" ==> false"))
+      %Q("#{regexp.source} (a boolean flag: "true","1","on","enabled" vs "false","0","off","disabled" ==> false"))
     else
       regexp.source
     end
