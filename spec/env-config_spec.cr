@@ -190,6 +190,50 @@ end
 
 ######################################################################
 
+old_foo_on = ENV["FOO_ON"]?
+old_foo_off = ENV["FOO_OFF"]?
+old_foo_enable = ENV["FOO_ENABLE"]?
+old_foo_disable = ENV["FOO_DISABLE"]?
+old_foo_1 = ENV["FOO_1"]?
+old_foo_0 = ENV["FOO_0"]?
+ENV["FOO_ON"] = "on"
+ENV["FOO_OFF"] = "off"
+ENV["FOO_ENABLE"] = "enable"
+ENV["FOO_DISABLE"] = "disable"
+ENV["FOO_1"] = "1"
+ENV["FOO_0"] = "0"
+
+class ConfigWithFlagDefault < EnvConfig
+  config do
+    expect_env FOO_ON, description: "Bool", type: Bool
+    expect_env FOO_OFF, description: "Bool", type: Bool
+    expect_env FOO_ENABLE, description: "Bool", type: Bool
+    expect_env FOO_DISABLE, description: "Bool", type: Bool
+    expect_env FOO_1, description: "Bool", type: Bool
+    expect_env FOO_0, description: "Bool", type: Bool
+  end
+end
+
+ENV["FOO_ON"] = old_foo_on
+ENV["FOO_OFF"] = old_foo_off
+ENV["FOO_ENABLE"] = old_foo_enable
+ENV["FOO_DISABLE"] = old_foo_disable
+ENV["FOO_1"] = old_foo_1
+ENV["FOO_0"] = old_foo_0
+
+describe ConfigWithFlagDefault do
+  it "works" do
+    ConfigWithFlagDefault::FOO_ON.should eq(true)
+    ConfigWithFlagDefault::FOO_OFF.should eq(false)
+    ConfigWithFlagDefault::FOO_ENABLE.should eq(true)
+    ConfigWithFlagDefault::FOO_DISABLE.should eq(false)
+    ConfigWithFlagDefault::FOO_1.should eq(true)
+    ConfigWithFlagDefault::FOO_0.should eq(false)
+  end
+end
+
+######################################################################
+
 old_foo = ENV["FOO"]?
 ENV["FOO"] = nil
 

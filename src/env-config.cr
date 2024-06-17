@@ -5,9 +5,9 @@ abstract class EnvConfig
 
   def self.to_bool(flag : String) : Bool
     case flag.strip.downcase
-    when "true", "1", "on", "enabled"
+    when "true", "1", "on", "enable", "enabled"
       true
-    when "false", "0", "off", "disabled"
+    when "false", "0", "off", "disable", "disabled"
       false
     else
       raise "Failed to parse boolean <<#{flag}>> (try \"true\" or \"false\" instead)"
@@ -113,7 +113,7 @@ abstract class EnvConfig
 
   # predefined matchers:
   NUMBER = /^[0-9]+$/
-  FLAG   = /\A(?:true|1|false|0)\z/i
+  FLAG   = /\A(?:true|false|on|off|1|0|enabled?|disabled?)\z/i
 
   def self.pretty_regexp(regexp : Regex) : String
     case regexp
