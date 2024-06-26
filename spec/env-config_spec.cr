@@ -124,10 +124,8 @@ ENV["FOO"] = "42"
 ENV["BAR"] = "2024-06-14"
 
 class ConfigWithRegexp < EnvConfig
-  config do
-    expect_env FOO, description: "Integer", type: Int32, regexp: NUMBER
-    expect_env BAR, description: "YYYY-MM-DD", regexp: /^\d{4}-\d{2}-\d{2}$/
-  end
+  expect_env FOO, description: "Integer", type: Int32, regexp: NUMBER
+  expect_env BAR, description: "YYYY-MM-DD", regexp: /^\d{4}-\d{2}-\d{2}$/
 end
 
 ENV["FOO"] = old_foo
@@ -148,10 +146,8 @@ ENV["FOO"] = nil
 ENV["BAR"] = nil
 
 class ConfigWithFlagDefault < EnvConfig
-  config do
-    expect_env FOO, description: "Bool", default: true
-    expect_env BAR, description: "Bool", default: false
-  end
+  expect_env FOO, description: "Bool", default: true
+  expect_env BAR, description: "Bool", default: false
 end
 
 ENV["FOO"] = old_foo
@@ -172,10 +168,8 @@ ENV["FOO"] = "true"
 ENV["BAR"] = "false"
 
 class ConfigWithFlagEnv < EnvConfig
-  config do
-    expect_env FOO, description: "Bool", type: Bool
-    expect_env BAR, description: "Bool", type: Bool
-  end
+  expect_env FOO, description: "Bool", type: Bool
+  expect_env BAR, description: "Bool", type: Bool
 end
 
 ENV["FOO"] = old_foo
@@ -204,14 +198,12 @@ ENV["FOO_1"] = "1"
 ENV["FOO_0"] = "0"
 
 class ConfigWithFlagDefault < EnvConfig
-  config do
-    expect_env FOO_ON, description: "Bool", type: Bool
-    expect_env FOO_OFF, description: "Bool", type: Bool
-    expect_env FOO_ENABLE, description: "Bool", type: Bool
-    expect_env FOO_DISABLE, description: "Bool", type: Bool
-    expect_env FOO_1, description: "Bool", type: Bool
-    expect_env FOO_0, description: "Bool", type: Bool
-  end
+  expect_env FOO_ON, description: "Bool", type: Bool
+  expect_env FOO_OFF, description: "Bool", type: Bool
+  expect_env FOO_ENABLE, description: "Bool", type: Bool
+  expect_env FOO_DISABLE, description: "Bool", type: Bool
+  expect_env FOO_1, description: "Bool", type: Bool
+  expect_env FOO_0, description: "Bool", type: Bool
 end
 
 ENV["FOO_ON"] = old_foo_on
@@ -238,9 +230,7 @@ old_foo = ENV["FOO"]?
 ENV["FOO"] = nil
 
 class ConfigWithInt64Default < EnvConfig
-  config do
-    expect_env FOO, description: "Int64 to be detected by default", default: 4000000000_i64
-  end
+  expect_env FOO, description: "Int64 to be detected by default", default: 4000000000_i64
 end
 
 ENV["FOO"] = old_foo
@@ -257,9 +247,7 @@ old_foo = ENV["FOO"]?
 ENV["FOO"] = "5000000000"
 
 class ConfigWithInt64Env < EnvConfig
-  config do
-    expect_env FOO, description: "Int64 to be detected by type", type: Int64
-  end
+  expect_env FOO, description: "Int64 to be detected by type", type: Int64
 end
 
 ENV["FOO"] = old_foo
@@ -276,9 +264,7 @@ old_foo = ENV["FOO"]?
 ENV["FOO"] = "3.14"
 
 class ConfigWithFloat32Env < EnvConfig
-  config do
-    expect_env FOO, description: "Float32 to be detected by type", type: Float32
-  end
+  expect_env FOO, description: "Float32 to be detected by type", type: Float32
 end
 
 ENV["FOO"] = old_foo
@@ -296,9 +282,7 @@ old_foo = ENV["FOO"]?
 ENV["FOO"] = "3.14"
 
 class ConfigWithFloat64Env < EnvConfig
-  config do
-    expect_env FOO, description: "Float64 to be detected by type", type: Float64
-  end
+  expect_env FOO, description: "Float64 to be detected by type", type: Float64
 end
 
 ENV["FOO"] = old_foo
@@ -316,9 +300,7 @@ old_foo = ENV["FOO"]?
 ENV["FOO"] = nil
 
 class ConfigWithFloat32Default < EnvConfig
-  config do
-    expect_env FOO, description: "Float32 to be detected by default", default: 3.14_f32
-  end
+  expect_env FOO, description: "Float32 to be detected by default", default: 3.14_f32
 end
 
 ENV["FOO"] = old_foo
@@ -336,9 +318,7 @@ old_foo = ENV["FOO"]?
 ENV["FOO"] = nil
 
 class ConfigWithFloat64Default < EnvConfig
-  config do
-    expect_env FOO, description: "Float64 to be detected by default", default: 3.14_f64
-  end
+  expect_env FOO, description: "Float64 to be detected by default", default: 3.14_f64
 end
 
 ENV["FOO"] = old_foo
