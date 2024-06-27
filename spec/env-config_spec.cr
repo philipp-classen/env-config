@@ -46,6 +46,7 @@ class ConfigMissing < EnvConfig
   @@missing_key = ""
 
   def self.terminate_handler!(key) : Nil
+    puts "(TEST) Expected error triggeredf for key=#{key}"
     @@missing_key = key
   end
 
@@ -53,7 +54,7 @@ class ConfigMissing < EnvConfig
     @@missing_key
   end
 
-  expect_env FOO, description: "This will fail, since it is not set"
+  expect_env FOO, description: "(TEST) Ignore this error! This is expected fail, since it is not set"
 end
 
 ENV["FOO"] = old_foo
@@ -327,5 +328,29 @@ describe ConfigWithFloat64Env do
   it "works" do
     ConfigWithFloat64Env::FOO.should eq(3.14_f64)
     ConfigWithFloat64Env::FOO.class.should eq(Float64)
+  end
+end
+
+######################################################################
+
+old_foo = ENV["FOO"]?
+old_bar = ENV["BAR"]?
+ENV["FOO"] = ""
+ENV["BAR"] = ""
+
+class ConfigWithStringBeingSetToEmpty < EnvConfig
+  expect_env FOO, description: "Mandatory String set to empty"
+  expect_env BAR, description: "Optional String set to empty", default: ""
+  expect_env BAZ, description: "String defaulting to empty", default: ""
+end
+
+ENV["FOO"] = old_foo
+ENV["BAR"] = old_bar
+
+describe ConfigWithStringBeingSetToEmpty do
+  it "works" do
+    ConfigWithStringBeingSetToEmpty::FOO.should eq("")
+    ConfigWithStringBeingSetToEmpty::BAR.should eq("")
+    ConfigWithStringBeingSetToEmpty::BAZ.should eq("")
   end
 end

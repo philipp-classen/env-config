@@ -3,6 +3,10 @@ require "log"
 abstract class EnvConfig
   Log = ::Log.for("env-config")
 
+  def self.to_bool(flag : Bool) : Bool
+    flag
+  end
+
   def self.to_bool(flag : String) : Bool
     case flag.strip.downcase
     when "true", "1", "on", "enable", "enabled"
@@ -16,14 +20,15 @@ abstract class EnvConfig
 
   # ameba:disable Metrics/CyclomaticComplexity
   def self.read_env_variable(key, **options)
-    value = ENV.fetch(key, options[:default]?.to_s || "")
-    if options[:optional]? != true && value.empty?
+    if options[:optional]? != true && options[:default]?.nil? && ENV[key]?.nil?
       puts "ERROR: expected environment variable: #{key}"
       puts "Description: #{options[:description]}" if options[:description]
       puts "Example: #{options[:example]?}" if options[:example]?
       puts "Default: #{options[:default]?}" if options[:default]?
-      terminate_handler!(key)
+      return terminate_handler!(key)
     end
+    value = ENV[key]?
+    return options[:default]? if value.nil?
 
     supported_types = {String, Bool, Int32, Int64, Float32, Float64}
     if options[:type]? && !supported_types.includes?(options[:type]?)
@@ -45,12 +50,12 @@ abstract class EnvConfig
     end
 
     regexp.try do |format|
-      unless format.match(value)
+      unless format.match(value.to_s)
         puts "ERROR: environment variable #{key} is ill-formed (got: <<#{value}>>, but expected: #{pretty_regexp(format)})"
         puts "Description: #{options[:description]}" if options[:description]
         puts "Example: #{options[:example]?}" if options[:example]?
         puts "Default: #{options[:default]?}" if options[:default]?
-        terminate_handler!(key)
+        return terminate_handler!(key)
       end
     end
 
@@ -58,22 +63,63 @@ abstract class EnvConfig
       if target == String
         value
       elsif target == Bool
-        to_bool(value)
+        begin
+          to_bool(value)
+        rescue e : Exception
+          puts "ERROR: failed to parse #{key} (value: <<#{value}>>, parse error: #{e})"
+          puts "Description: #{options[:description]}" if options[:description]
+          puts "Example: #{options[:example]?}" if options[:example]?
+          puts "Default: #{options[:default]?}" if options[:default]?
+          return terminate_handler!(key)
+        end
       elsif target == Int32
-        value.to_i
+        begin
+          value.is_a?(String) ? value.to_i : value
+        rescue e : Exception
+          p! "HIT"
+          puts "ERROR: failed to parse #{key} (value: <<#{value}>>, parse error: #{e})"
+          puts "Description: #{options[:description]}" if options[:description]
+          puts "Example: #{options[:example]?}" if options[:example]?
+          puts "Default: #{options[:default]?}" if options[:default]?
+          return terminate_handler!(key)
+        end
       elsif target == Int64
-        value.to_i64
+        begin
+          value.is_a?(String) ? value.to_i64 : value
+        rescue e : Exception
+          puts "ERROR: failed to parse #{key} (value: <<#{value}>>, parse error: #{e})"
+          puts "Description: #{options[:description]}" if options[:description]
+          puts "Example: #{options[:example]?}" if options[:example]?
+          puts "Default: #{options[:default]?}" if options[:default]?
+          return terminate_handler!(key)
+        end
       elsif target == Float32
-        value.to_f32
+        begin
+          value.is_a?(String) ? value.to_f32 : value
+        rescue e : Exception
+          puts "ERROR: failed to parse #{key} (value: <<#{value}>>, parse error: #{e})"
+          puts "Description: #{options[:description]}" if options[:description]
+          puts "Example: #{options[:example]?}" if options[:example]?
+          puts "Default: #{options[:default]?}" if options[:default]?
+          return terminate_handler!(key)
+        end
       elsif target == Float64
-        value.to_f64
+        begin
+          value.is_a?(String) ? value.to_f64 : value
+        rescue e : Exception
+          puts "ERROR: failed to parse #{key} (value: <<#{value}>>, parse error: #{e})"
+          puts "Description: #{options[:description]}" if options[:description]
+          puts "Example: #{options[:example]?}" if options[:example]?
+          puts "Default: #{options[:default]?}" if options[:default]?
+          return terminate_handler!(key)
+        end
       else
         puts "ERROR: unsupported type detected for environment variable #{key} (got: <<#{value}>>, deduced <<#{value}}>> of type <<#{target}>>)"
         puts "Description: #{options[:description]}" if options[:description]
         puts "Example: #{options[:example]?}" if options[:example]?
         puts "Default: #{options[:default]?}" if options[:default]?
         puts "Hint: if nothing works, try to use a String, and then write your own converter."
-        terminate_handler!(key)
+        return terminate_handler!(key)
       end
 
     Log.info { result.is_a?(String) && result.empty? ? "#{key} => (not set)" : "#{key} => #{result}" }
