@@ -9,9 +9,9 @@ abstract class EnvConfig
 
   def self.to_bool(flag : String) : Bool
     case flag.strip.downcase
-    when "true", "1", "on", "enable", "enabled"
+    when "true", "1", "on", "enable", "enabled", "yes"
       true
-    when "false", "0", "off", "disable", "disabled"
+    when "false", "0", "off", "disable", "disabled", "no"
       false
     else
       raise "Failed to parse boolean <<#{flag}>> (try \"true\" or \"false\" instead)"
@@ -76,7 +76,6 @@ abstract class EnvConfig
         begin
           value.is_a?(String) ? value.to_i : value
         rescue e : Exception
-          p! "HIT"
           puts "ERROR: failed to parse #{key} (value: <<#{value}>>, parse error: #{e})"
           puts "Description: #{options[:description]}" if options[:description]
           puts "Example: #{options[:example]?}" if options[:example]?
@@ -157,14 +156,14 @@ abstract class EnvConfig
 
   # predefined matchers:
   NUMBER = /^[0-9]+$/
-  FLAG   = /\A(?:true|false|on|off|1|0|enabled?|disabled?)\z/i
+  FLAG   = /\A(?:true|false|on|off|1|0|enabled?|disabled?|yes|no)\z/i
 
   def self.pretty_regexp(regexp : Regex) : String
     case regexp
     when NUMBER
       %Q("#{regexp.source} (a non-negative integer)")
     when FLAG
-      %Q("#{regexp.source} (a boolean flag: "true","1","on","enabled" vs "false","0","off","disabled" ==> false"))
+      %Q("#{regexp.source} (a boolean flag: "true","1","on","enabled","yes" vs "false","0","off","disabled","no"))
     else
       regexp.source
     end

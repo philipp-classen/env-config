@@ -46,7 +46,7 @@ class ConfigMissing < EnvConfig
   @@missing_key = ""
 
   def self.terminate_handler!(key) : Nil
-    puts "(TEST) Expected error triggeredf for key=#{key}"
+    puts "(TEST) Expected error triggered for key=#{key}"
     @@missing_key = key
   end
 
@@ -54,7 +54,7 @@ class ConfigMissing < EnvConfig
     @@missing_key
   end
 
-  expect_env FOO, description: "(TEST) Ignore this error! This is expected fail, since it is not set"
+  expect_env FOO, description: "(TEST) Ignore this error! This is expected fail, since the variable is not set."
 end
 
 ENV["FOO"] = old_foo
@@ -191,12 +191,16 @@ old_foo_enable = ENV["FOO_ENABLE"]?
 old_foo_disable = ENV["FOO_DISABLE"]?
 old_foo_1 = ENV["FOO_1"]?
 old_foo_0 = ENV["FOO_0"]?
+old_foo_yes = ENV["FOO_YES"]?
+old_foo_no = ENV["FOO_NO"]?
 ENV["FOO_ON"] = "on"
 ENV["FOO_OFF"] = "off"
 ENV["FOO_ENABLE"] = "enable"
 ENV["FOO_DISABLE"] = "disable"
 ENV["FOO_1"] = "1"
 ENV["FOO_0"] = "0"
+ENV["FOO_YES"] = "yes"
+ENV["FOO_NO"] = "no"
 
 class ConfigWithFlagDefault < EnvConfig
   expect_env FOO_ON, description: "Bool", type: Bool
@@ -205,6 +209,8 @@ class ConfigWithFlagDefault < EnvConfig
   expect_env FOO_DISABLE, description: "Bool", type: Bool
   expect_env FOO_1, description: "Bool", type: Bool
   expect_env FOO_0, description: "Bool", type: Bool
+  expect_env FOO_YES, description: "Bool", type: Bool
+  expect_env FOO_NO, description: "Bool", type: Bool
 end
 
 ENV["FOO_ON"] = old_foo_on
@@ -213,6 +219,8 @@ ENV["FOO_ENABLE"] = old_foo_enable
 ENV["FOO_DISABLE"] = old_foo_disable
 ENV["FOO_1"] = old_foo_1
 ENV["FOO_0"] = old_foo_0
+ENV["FOO_YES"] = old_foo_yes
+ENV["FOO_NO"] = old_foo_no
 
 describe ConfigWithFlagDefault do
   it "works" do
@@ -222,6 +230,8 @@ describe ConfigWithFlagDefault do
     ConfigWithFlagDefault::FOO_DISABLE.should eq(false)
     ConfigWithFlagDefault::FOO_1.should eq(true)
     ConfigWithFlagDefault::FOO_0.should eq(false)
+    ConfigWithFlagDefault::FOO_YES.should eq(true)
+    ConfigWithFlagDefault::FOO_NO.should eq(false)
   end
 end
 
