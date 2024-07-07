@@ -20,6 +20,10 @@ abstract class EnvConfig
 
   # ameba:disable Metrics/CyclomaticComplexity
   def self.read_env_variable(key, **options)
+    if {"NUMBER", "FLAG", "NOT_BLANK"}.includes?(key)
+      raise "Reserved keyword: #{key} (conflicts with matchers)"
+    end
+
     if options[:optional]? != true && options[:default]?.nil? && ENV[key]?.nil?
       puts "ERROR: expected environment variable: #{key}"
       puts "Description: #{options[:description]}" if options[:description]
@@ -51,7 +55,7 @@ abstract class EnvConfig
 
     regexp.try do |format|
       unless format.match(value.to_s)
-        puts "ERROR: environment variable #{key} is ill-formed (got: <<#{value}>>, but expected: #{pretty_regexp(format)})"
+        puts "ERROR: environment variable #{key} is ill-formed (got: #{pretty_value(value)}, but expected: #{pretty_regexp(format)})"
         puts "Description: #{options[:description]}" if options[:description]
         puts "Example: #{options[:example]?}" if options[:example]?
         puts "Default: #{options[:default]?}" if options[:default]?
@@ -155,17 +159,28 @@ abstract class EnvConfig
   end
 
   # predefined matchers:
-  NUMBER = /^[0-9]+$/
-  FLAG   = /\A(?:true|false|on|off|1|0|enabled?|disabled?|yes|no)\z/i
+  NUMBER    = /^[0-9]+$/
+  FLAG      = /\A(?:true|false|on|off|1|0|enabled?|disabled?|yes|no)\z/i
+  NOT_BLANK = /\S/
 
   def self.pretty_regexp(regexp : Regex) : String
     case regexp
     when NUMBER
-      %Q("#{regexp.source} (a non-negative integer)")
+      "a non-negative integer"
     when FLAG
-      %Q("#{regexp.source} (a boolean flag: "true","1","on","enabled","yes" vs "false","0","off","disabled","no"))
+      %q(a boolean flag: "true","1","on","enabled","yes" vs "false","0","off","disabled","no")
+    when NOT_BLANK
+      "a non-blank string"
     else
       regexp.source
+    end
+  end
+
+  def self.pretty_value(value)
+    if value.is_a?(String)
+      value.empty? ? %q("" (empty string)) : value.inspect
+    else
+      value
     end
   end
 

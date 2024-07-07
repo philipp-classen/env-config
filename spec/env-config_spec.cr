@@ -364,3 +364,30 @@ describe ConfigWithStringBeingSetToEmpty do
     ConfigWithStringBeingSetToEmpty::BAZ.should eq("")
   end
 end
+
+######################################################################
+
+old_foo_number = ENV["FOO_NUMBER"]?
+old_foo_flag = ENV["FOO_FLAG"]?
+old_foo_not_blank = ENV["FOO_NOT_BLANK"]?
+ENV["FOO_NUMBER"] = "123"
+ENV["FOO_FLAG"] = "true"
+ENV["FOO_NOT_BLANK"] = "not blank"
+
+class ConfigWithFlags < EnvConfig
+  expect_env FOO_NUMBER, description: "Number", type: Int32, regexp: NUMBER
+  expect_env FOO_FLAG, description: "Flag", type: Bool, regexp: FLAG
+  expect_env FOO_NOT_BLANK, description: "non-blank string", regexp: NOT_BLANK
+end
+
+ENV["FOO_NUMBER"] = old_foo_number
+ENV["FOO_FLAG"] = old_foo_flag
+ENV["FOO_NOT_BLANK"] = old_foo_not_blank
+
+describe ConfigWithFlags do
+  it "works" do
+    ConfigWithFlags::FOO_NUMBER.should eq(123)
+    ConfigWithFlags::FOO_FLAG.should eq(true)
+    ConfigWithFlags::FOO_NOT_BLANK.should eq("not blank")
+  end
+end
