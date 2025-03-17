@@ -32,7 +32,11 @@ abstract class EnvConfig
       return terminate_handler!(key)
     end
     value = ENV[key]?
-    return options[:default]? if value.nil?
+    if value.nil?
+      result = options[:default]?
+      Log.info { result.is_a?(String) && result.empty? ? "#{key} (default) => (not set)" : "#{key} (default) => #{result}" }
+      return result
+    end
 
     supported_types = {String, Bool, Int32, Int64, Float32, Float64}
     if options[:type]? && !supported_types.includes?(options[:type]?)
