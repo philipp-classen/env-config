@@ -1,7 +1,7 @@
 require "log"
 
 abstract class EnvConfig
-  Log = ::Log.for("env-config")
+  LOGS = IO::Memory.new
 
   def self.to_bool(flag : Bool) : Bool
     flag
@@ -34,7 +34,7 @@ abstract class EnvConfig
     value = ENV[key]?
     if value.nil?
       result = options[:default]?
-      Log.info { result.is_a?(String) && result.empty? ? "#{key} (default) => (not set)" : "#{key} (default) => #{result}" }
+      LOGS.puts(result.is_a?(String) && result.empty? ? "#{key} (default) => (not set)" : "#{key} (default) => #{result}")
       return result
     end
 
@@ -129,7 +129,7 @@ abstract class EnvConfig
         return terminate_handler!(key)
       end
 
-    Log.info { result.is_a?(String) && result.empty? ? "#{key} => (not set)" : "#{key} => #{result}" }
+    LOGS.puts(result.is_a?(String) && result.empty? ? "#{key} => (not set)" : "#{key} => #{result}")
     result
   end
 
@@ -157,9 +157,10 @@ abstract class EnvConfig
   end
 
   macro config(conf = "config")
-    Log.info { "# %s begin" % {{ conf }} }
+    LOGS.puts unless LOGS.empty?
+    LOGS.puts("# %s begin" % {{ conf }})
     {{ yield }}
-    Log.info { "# %s end\n" % {{ conf }} }
+    LOGS.puts("# %s end" % {{ conf }})
   end
 
   # predefined matchers:
@@ -186,6 +187,11 @@ abstract class EnvConfig
     else
       value
     end
+  end
+
+  def self.print_config(io = STDOUT)
+    LOGS.rewind
+    IO.copy(LOGS, io)
   end
 
   # If you do not want to exit, you can override the function. But note that

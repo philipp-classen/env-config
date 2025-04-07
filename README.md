@@ -80,6 +80,9 @@ p! Config5::NUM_WORKERS.class # -> Int32
 # If NUM_WORKERS=-1, it would fail with with this error message:
 # ERROR: environment variable NUM_WORKERS is ill-formed (got: <<-1>>, but expected: ^[0-9]+$)
 # Description: Number of workers
+
+# Print a summary:
+EnvConfig.print_config
 ```
 
 ## Development
